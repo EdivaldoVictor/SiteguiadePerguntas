@@ -15,4 +15,8 @@ app.get("/perguntar",(req,res) =>{
     res.render("perguntar")
 });
 
+app.post("/salvarpergunta", (req,res) =>{
+    res.send("Formulário recebido!")
+});
+
 app.listen(8080,() =>{console.log("Listening on port 8080");});
