@@ -1,6 +1,18 @@
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
+const connection = require("./database/database");
+const Pergunta = require("./database/Pergunta");
+//Database
+
+connection
+.authenticate()
+.then(()=> {
+    console.log("Database connected");
+})
+.catch((msgErro)=>{
+    console.log(msgErro);
+});
 
 //Estou dizendo ao express para usar o EJS como view engine
 app.set('view engine', 'ejs');
@@ -10,9 +22,13 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 // Rotas
 app.get("/",(req,res ) =>{
-
-    res.render("index",{
+    Pergunta.findAll({ raw: true }).then(perguntas =>{
+      res.render("index",{
+        perguntas: perguntas
+      })
+      
     });
+    
 });
 
 app.get("/perguntar",(req,res) =>{
@@ -22,7 +38,12 @@ app.get("/perguntar",(req,res) =>{
 app.post("/salvarpergunta", (req,res) =>{
     let titulo = req.body.titulo;
     let descricao = req.body.descricao;
-    res.send("Formulário recebido ! titulo: " + " " + titulo + " descricao " + descricao); 
+    Pergunta.create({
+        titulo: titulo,
+        descricao: descricao
+    }).then(()=>{
+        res.redirect("/");
+    })
 });
 
 app.listen(8080,() =>{console.log("Listening on port 8080");});
